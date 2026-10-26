@@ -7,6 +7,7 @@ import seaborn as sns
 def plot_correlation(df: pd.DataFrame):    
     """
     Creates a Heatmap using the correlation between an input dataframe's columns.
+
     Input:
         The dataframe 
     """     
@@ -65,13 +66,23 @@ def standardise(df: pd.DataFrame)-> pd.DataFrame:
     std = df.std(axis=0).replace(0, 1)
     return (df - mean) / std
 
-def PCA_scatter_plot(df: pd.DataFrame, labels: np.ndarray):
+def PCA_scatter_plot(df: pd.DataFrame, labels: np.ndarray, true_outliers:np.ndarray = None):
+    """
+    Projects the dataset on using PCA to plot the points along the 2 principal dimensions.
+    Marks the outliers found by COR with a cross and, if it is provided, highlights the true outlier set 
+    Inputs:
+    -   df: the data matrix
+    -   labels: the vector of labels assigned by COR
+    -   true_outliers: boolean vector of the true outliers
+    """
     p = PCA(2).fit_transform(df)
     inliers_mask = labels>=0
+    outliers_mask = labels ==-1
     plt.figure(figsize=(10,10))
     plt.scatter(p[inliers_mask,0], p[inliers_mask,1], c = labels[inliers_mask], cmap = "tab10", s = 33, alpha = 0.6)
-    plt.scatter(p[labels ==-1, 0], p[labels ==-1, 1], marker = "x", c = "black", s = 20, label = "outliers found by COR")
-    # plt.scatter(p[true_outliers, 0], p[true_outliers, 1], facecolors="none", edgecolors="red",
-    #               s=70, label="real outliers")
+    plt.scatter(p[outliers_mask, 0], p[outliers_mask, 1], marker = "x", c = "black", s = 20, label = "outliers found by COR")
+    if true_outliers is not None:
+        plt.scatter(p[true_outliers, 0], p[true_outliers, 1], facecolors="none", edgecolors="red",
+                    s=70, label="real outliers")
     plt.legend()
     plt.show()
