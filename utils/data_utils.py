@@ -4,22 +4,6 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 import seaborn as sns
 
-def plot_correlation(df: pd.DataFrame):    
-    """
-    Creates a Heatmap using the correlation between an input dataframe's columns.
-
-    Input:
-        The dataframe 
-    """     
-    mask = np.triu(np.ones_like(df.corr(numeric_only=True), dtype=bool)) 
-
-    plt.figure(figsize=(10, 8))
-    sns.heatmap(df.corr(numeric_only=True), mask=mask, annot=True,cmap="RdBu_r", vmin=-1, vmax=1, square=True, linewidths=0.5)
-    plt.xticks(rotation=45, ha="right")
-    plt.title("Correlation")
-    plt.tight_layout()
-    plt.show()
-
 def make_categoric_partitions(df:pd.DataFrame, ignore: list = None) -> tuple[pd.DataFrame, list[np.ndarray]]:
     """
     Separates the categorical columns of a dataframe and turns them into partitions.
@@ -65,6 +49,47 @@ def standardise(df: pd.DataFrame)-> pd.DataFrame:
     mean = df.mean(axis=0)
     std = df.std(axis=0).replace(0, 1)
     return (df - mean) / std
+
+def find_most_redundant_columns(df: pd.DataFrame, how_many: int = 1) -> list[str]:
+    """
+    Provides the names of the most redundant columns based on the highest mean of the (absolute) correlations with others. 
+    Each column is removed from the dataframe's copy to check the remaining correlation. 
+
+    Inputs:
+    -   df: the (numerical) dataframe
+    -   how_many: the number of columns to find, 1 by default
+
+    Output:
+        The list of the "how_many" most redundant columns, in order of removal
+    """
+    remaining = df.copy()
+    redundant_cols = []
+    for _ in range(how_many):
+        corr = remaining.corr().abs()
+        mean_corr = (corr.sum()-1)/(len(corr)-1) #the numerator has -1 to remove the correlation between the column and itself
+        col = mean_corr.idxmax()
+        redundant_cols.append(col)
+        remaining = remaining.drop(columns=col)
+    return redundant_cols
+
+#PLOTS# --------------------------------------------------------------
+
+def plot_correlation(df: pd.DataFrame, show_values: bool = True):
+    """
+    Creates a Heatmap using the correlation between an input dataframe's columns.
+
+    Inputs:
+    -   df: the dataframe
+    -   show_values: whether to write the correlation values in the cells. True by default
+    """
+    mask = np.triu(np.ones_like(df.corr(numeric_only=True), dtype=bool))
+
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(numeric_only=True), mask=mask, annot=show_values, cmap="RdBu_r", vmin=-1, vmax=1, square=True, linewidths=0.5)
+    plt.xticks(rotation=45, ha="right")
+    plt.title("Correlation")
+    plt.tight_layout()
+    plt.show()
 
 def PCA_scatter_plot(df: pd.DataFrame, labels: np.ndarray, true_outliers:np.ndarray = None):
     """
