@@ -16,7 +16,7 @@ python3 -m venv .venv
 source .venv/bin/activate        # on Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
-```
+
 
 ## Run the code
 
