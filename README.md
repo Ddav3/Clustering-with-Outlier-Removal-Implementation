@@ -21,7 +21,7 @@ pip install -r requirements.txt
 ## Run the code
 
 Open `cor_test.ipynb` and run the cells in order. The first cells define COR and the global settings;
-the following sections run the test on different dataset.
+the following sections run the test on different datasets.
 
 Each test cell runs a single configuration of $K$ and $o$: the comments in the cells indicate which parameters to change
 to obtain the other results shown in the report. Note that the sensitivity analysis on *Forest Fires* runs COR on a

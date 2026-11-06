@@ -9,7 +9,7 @@ def generate_basic_partitions(X:pd.DataFrame, r:int, k_min:int = 2, k_max: int= 
     -   X: the data matrix;
     -   r: the number of basic partitions; 
     -   k_min: the minimum number of clusters in each partition. 2 by default;
-    -   k_max: the maximum number of clusters that may compose each partition. It's value is k_min**2 by default;
+    -   k_max: the maximum number of clusters that may compose each partition. Its value is k_min**2 by default;
     -   seed: the random seed used for reproducibility
     
     Outputs:
@@ -70,7 +70,7 @@ def generate_centroids(BB: np.ndarray, K: int)-> np.ndarray:
 def compute_kl_distances(BB: np.ndarray, centroids: np.ndarray, return_matrix:bool= False) -> tuple[np.ndarray,np.ndarray]| tuple[np.ndarray,np.ndarray,np.ndarray]:
     """
     Computes the KL distances between all points of the matrix and the centroids. 
-    Note that the we are working with the original formula: D_KL(P(x)||Q(x)) = sum_P(x) log (P(x)/Q(x))
+    Note that we are working with the original formula: D_KL(P(x)||Q(x)) = sum_P(x) log (P(x)/Q(x))
     and since b can be either 0 or 1, we have that:
     -   the limit for x->0 of xlog(x/m) is 0,
     -   1log(1/m) = - log(m),
@@ -131,14 +131,14 @@ def update_centroids(BB:np.ndarray, labels: np.ndarray, old_centroids: np.ndarra
             centroids[k] = cluster.mean(axis = 0)
     return centroids
 
-def compute_holoentropy(BB: np.ndarray,labels: np.ndarray, centroids: np.ndarray) -> float:
+def compute_holoentropy(labels: np.ndarray, centroids: np.ndarray) -> float:
     """
     Provides the result of the objective function on the K-means-- configuration dictated by the labels.
     The value is computed as the sum of the entropies for each cluster.
 
     Inputs:
-    -   BB: the concatenated binary matrix
     -   labels: the vector of labels
+    -   centroids: the list of centroids
 
     Output: 
         The objective value 
