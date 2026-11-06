@@ -22,20 +22,6 @@ def make_categoric_partitions(df:pd.DataFrame, ignore: list = None) -> tuple[pd.
     categ_cols =[col for col in df.select_dtypes(exclude="number").columns if col not in ignore]
     partitions = [pd.factorize(df[col])[0] for col in categ_cols] 
     return df.drop(columns=categ_cols+ignore), partitions
-    
-def normalise(df: pd.DataFrame)-> pd.DataFrame:  #unused
-    """
-    Normalises each column of a given dataframe.
-    """
-    for col in df.columns:
-        if df[col].dtype.kind not in "iuf":
-            print("Dataset is not fully numeric. Force quitted.")
-            return
-
-    min = df.min(axis = 0)
-    max = df.max(axis = 0)
-    range = (max - min).replace(0,1)
-    return (df - min)/range
 
 def standardise(df: pd.DataFrame)-> pd.DataFrame:
     """
@@ -43,8 +29,7 @@ def standardise(df: pd.DataFrame)-> pd.DataFrame:
     """
     for col in df.columns:
         if df[col].dtype.kind not in "iuf":
-            print("Dataset is not fully numeric. Force quitted.")
-            return
+            raise ValueError("Dataset is not fully numeric. Force quitted.")
 
     mean = df.mean(axis=0)
     std = df.std(axis=0).replace(0, 1)

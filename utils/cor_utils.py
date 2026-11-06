@@ -9,7 +9,8 @@ def generate_basic_partitions(X:pd.DataFrame, r:int, k_min:int = 2, k_max: int= 
     -   X: the data matrix;
     -   r: the number of basic partitions; 
     -   k_min: the minimum number of clusters in each partition. 2 by default;
-    -   k_max: the maximum number of clusters that may compone each partition. No default value is provided;
+    -   k_max: the maximum number of clusters that may compose each partition. It's value is k_min**2 by default;
+    -   seed: the random seed used for reproducibility
     
     Outputs:
         The r partitions, in the form of a list of length r
@@ -47,16 +48,16 @@ def build_binary_matrices(partitions: list[np.ndarray])-> tuple[np.ndarray, np.n
     B = np.array(cols).T
     return B, 1-B
 
-def generate_centroids(BB: list[np.ndarray], K: int)-> list[np.ndarray]:
+def generate_centroids(BB: np.ndarray, K: int)-> np.ndarray:
     """
-    Produces K centroids for the binary matrix BB, randomly variating the dimensions.
+    Produces K centroids for the binary matrix BB, randomly choosing K distinct combinations among those in BB.
 
     Inputs:
     -   BB: the concatenated binary matrix
     -   K: the number of centroids (and clusters)
 
     Output:
-        A list of K centroids randomly taken from BB
+        The list of K centroids randomly taken from BB
     """
     uniques = np.unique(BB, axis = 0)
     if(K > BB.shape[0]):
@@ -69,11 +70,11 @@ def generate_centroids(BB: list[np.ndarray], K: int)-> list[np.ndarray]:
 def compute_kl_distances(BB: np.ndarray, centroids: np.ndarray, return_matrix:bool= False) -> tuple[np.ndarray,np.ndarray]| tuple[np.ndarray,np.ndarray,np.ndarray]:
     """
     Computes the KL distances between all points of the matrix and the centroids. 
-    Note that the we are working on the original formula is: D_KL(P(x)||Q(x)) = sum_P(x) log (P(x)/Q(x))
+    Note that the we are working with the original formula: D_KL(P(x)||Q(x)) = sum_P(x) log (P(x)/Q(x))
     and since b can be either 0 or 1, we have that:
     -   the limit for x->0 of xlog(x/m) is 0,
     -   1log(1/m) = - log(m),
-    we directly compute the result as: - BB * log (m).
+    So it directly computes the result as: - BB * log2 (m).
 
     Inputs:
     -   BB: the concatenated binary matrix 
@@ -143,11 +144,10 @@ def compute_holoentropy(BB: np.ndarray,labels: np.ndarray, centroids: np.ndarray
         The objective value 
     """
     result = 0
-    for k in range(len(centroids)):
-        C_k = BB[labels == k] 
+    for k, p in enumerate(centroids):
+        C_k = labels[labels==k]
         if len(C_k) == 0:
             continue
-        p = C_k.mean(axis= 0) 
         p = p[p > 0]   
         result += - len(C_k)* (p * np.log2(p)).sum() 
     return result
