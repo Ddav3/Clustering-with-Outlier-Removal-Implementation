@@ -17,13 +17,12 @@ def evaluate_COR(COR_labels: np.ndarray, true_labels: np.ndarray = None, true_ou
         A dictionary with the four metrics (None for the ones that cannot be computed)
     """
     outliers_mask = COR_labels == -1
-
     if true_labels is None:
         return {"NMI": None, "R_n": None,
                 "Jaccard": jaccard_score(true_outliers, outliers_mask, zero_division=1.0),
                 "F-measure": f1_score(true_outliers, outliers_mask, zero_division=0.0)}
     if true_outliers is None:
-        inliers_mask = ~outliers_mask
+        inliers_mask = COR_labels !=-1
         return {"NMI": normalized_mutual_info_score(true_labels[inliers_mask], COR_labels[inliers_mask], average_method="geometric"),
                 "R_n": adjusted_rand_score(true_labels[inliers_mask], COR_labels[inliers_mask]),
                 "Jaccard": None, "F-measure": None}

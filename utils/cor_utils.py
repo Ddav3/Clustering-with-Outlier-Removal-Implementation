@@ -85,7 +85,10 @@ def compute_kl_distances(BB: np.ndarray, centroids: np.ndarray, return_matrix:bo
     -   the label of the cluster of the closest centroid
     -   the distance from the closest centroid
     """
-    m = np.clip(centroids, 1e-12, None)
+    #to avoid log(0)
+    m = centroids.copy()
+    m[centroids == 0] = 1e-12 
+
     distances = -(BB @ np.log2(m).T)
     if return_matrix:
         return distances, distances.argmin(axis=1), distances.min(axis = 1)
