@@ -144,10 +144,10 @@ def compute_holoentropy(labels: np.ndarray, centroids: np.ndarray) -> float:
         The objective value 
     """
     result = 0
-    for k, p in enumerate(centroids):
+    for k, centroid in enumerate(centroids):
         C_k = labels[labels==k]
         if len(C_k) == 0:
             continue
-        p = p[p > 0]   
-        result += - len(C_k)* (p * np.log2(p)).sum() 
+        centroid = centroid[centroid > 0]   
+        result += - len(C_k)* (centroid * np.log2(centroid)).sum() 
     return result
